@@ -1,0 +1,23 @@
+{
+  "name": "oracle-sentinel",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "contracts",
+    "frontend"
+  ],
+  "scripts": {
+    "contracts:compile": "yarn workspace oracle-sentinel-contracts compile",
+    "contracts:test": "yarn workspace oracle-sentinel-contracts test",
+    "contracts:deploy": "yarn workspace oracle-sentinel-contracts deploy",
+    "frontend:dev": "yarn workspace oracle-sentinel-frontend dev",
+    "frontend:build": "yarn workspace oracle-sentinel-frontend build",
+    "agents:install": "cd agents && pip install -r requirements.txt",
+    "agents:start": "cd agents && python main.py",
+    "backend:start": "cd backend && python main.py",
+    "dev": "concurrently \"yarn backend:start\" \"yarn frontend:dev\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

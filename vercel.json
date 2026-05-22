@@ -1,0 +1,6 @@
+{
+  "buildCommand": "yarn workspace oracle-sentinel-frontend build",
+  "outputDirectory": "frontend/.next",
+  "installCommand": "yarn install",
+  "framework": "nextjs"
+}
