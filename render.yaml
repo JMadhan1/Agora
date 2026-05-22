@@ -7,9 +7,9 @@ services:
     startCommand: python main.py
     envVars:
       - key: PYTHON_VERSION
-        value: 3.11.0
-      - key: PORT
-        generateValue: false
+        value: "3.11.0"
+      - key: DATABASE_URL
+        value: "sqlite:////tmp/oracle_sentinel.db"
       - key: ARC_RPC_KEY
         sync: false
       - key: DEPLOYER_PRIVATE_KEY
