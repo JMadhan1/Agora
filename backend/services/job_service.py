@@ -1,8 +1,5 @@
 """Job and earnings service."""
 from __future__ import annotations
-import sys
-from pathlib import Path
-sys.path.insert(0, str(Path(__file__).parent.parent.parent / "agents"))
 
 import structlog
 
@@ -12,8 +9,8 @@ log = structlog.get_logger()
 class JobService:
     async def get_job_earnings_summary(self, db_session) -> dict:
         try:
-            from storage.models import AgentJob
-            jobs = db_session.query(AgentJob).filter(AgentJob.status == "COMPLETED").all()
+            from storage.database import AgentJobRecord
+            jobs = db_session.query(AgentJobRecord).filter(AgentJobRecord.status == "COMPLETED").all()
             total = sum(j.usdc_earned or 0 for j in jobs)
             return {
                 "completed_jobs": len(jobs),
@@ -36,7 +33,7 @@ class JobService:
                 return 0.0
 
             USYC_TOKEN = "0xe9185F0c5F296Ed1797AaE4238D26CCaBEadb86C"
-            ABI = [{"inputs":[{"name":"account","type":"address"}],"name":"balanceOf","outputs":[{"name":"","type":"uint256"}],"stateMutability":"view","type":"function"}]
+            ABI = [{"inputs": [{"name": "account", "type": "address"}], "name": "balanceOf", "outputs": [{"name": "", "type": "uint256"}], "stateMutability": "view", "type": "function"}]
 
             w3 = AsyncWeb3(AsyncHTTPProvider(rpc_url))
             contract = w3.eth.contract(address=AsyncWeb3.to_checksum_address(USYC_TOKEN), abi=ABI)

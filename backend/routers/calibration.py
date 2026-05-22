@@ -25,7 +25,7 @@ class CalibrationRecordOut(BaseModel):
     actual_outcome: float
     brier_score: Optional[float]
     correct: Optional[bool]
-    timestamp: str
+    recorded_at: str
 
     model_config = {"from_attributes": True}
 
@@ -77,13 +77,13 @@ def _get_calibration_stats(db: Session) -> CalibrationStatsOut:
     cutoff = (datetime.now(timezone.utc) - timedelta(days=7)).isoformat()
     total_7d = (
         db.query(func.count(CalibrationRecord.id))
-        .filter(CalibrationRecord.timestamp >= cutoff)
+        .filter(CalibrationRecord.recorded_at >= cutoff)
         .scalar()
         or 0
     )
     correct_7d = (
         db.query(func.count(CalibrationRecord.id))
-        .filter(CalibrationRecord.timestamp >= cutoff, CalibrationRecord.correct == True)  # noqa: E712
+        .filter(CalibrationRecord.recorded_at >= cutoff, CalibrationRecord.correct == True)  # noqa: E712
         .scalar()
         or 0
     )
@@ -116,7 +116,7 @@ def get_calibration_history(
 ) -> List[CalibrationRecordOut]:
     records = (
         db.query(CalibrationRecord)
-        .order_by(CalibrationRecord.timestamp.desc())
+        .order_by(CalibrationRecord.recorded_at.desc())
         .limit(limit)
         .all()
     )
@@ -132,7 +132,7 @@ def get_brier_score(db: Session = Depends(get_db)) -> BrierScoreOut:
     cutoff = (datetime.now(timezone.utc) - timedelta(days=7)).isoformat()
     rolling_7d = (
         db.query(func.avg(CalibrationRecord.brier_score))
-        .filter(CalibrationRecord.timestamp >= cutoff)
+        .filter(CalibrationRecord.recorded_at >= cutoff)
         .scalar()
         or 0.0
     )

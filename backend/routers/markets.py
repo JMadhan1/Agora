@@ -70,7 +70,7 @@ async def list_markets(
     if not records:
         # Attempt to fetch live Polymarket data when DB is empty.
         try:
-            service = MarketService(db)
+            service = MarketService()
             live = await service.get_live_polymarket_markets(limit=limit)
             return live  # type: ignore[return-value]
         except Exception as exc:

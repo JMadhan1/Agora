@@ -129,3 +129,10 @@ def get_db() -> Generator[Session, None, None]:
         yield db
     finally:
         db.close()
+
+
+# Alias used by routers written against the agents/storage API
+get_db_fastapi = get_db
+
+# Model aliases so routers can import AgentJob without caring which layer they're on
+AgentJob = AgentJobRecord
