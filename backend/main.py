@@ -1,18 +1,20 @@
 """Oracle Sentinel API — FastAPI backend serving dashboard + agent data"""
-import asyncio
 import os
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import structlog
-import sys
-from pathlib import Path
-
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "agents"))
 
 from storage.database import init_db
 from routers import markets, attestations, agents, jobs, calibration, watchdog, eurc, nanopayments, mcp, insurance
-from websocket import router as ws_router
+
+# WebSocket not supported on Vercel serverless — imported optionally
+try:
+    from websocket import router as ws_router
+    _ws_enabled = True
+except Exception:
+    ws_router = None
+    _ws_enabled = False
 
 log = structlog.get_logger()
 
@@ -57,7 +59,8 @@ app.include_router(eurc.router, prefix="/api/eurc", tags=["eurc"])
 app.include_router(nanopayments.router, prefix="/api/nanopayments", tags=["nanopayments"])
 app.include_router(mcp.router, prefix="/mcp/v1", tags=["mcp"])
 app.include_router(insurance.router, prefix="/api/insurance", tags=["insurance"])
-app.include_router(ws_router)
+if _ws_enabled and ws_router is not None:
+    app.include_router(ws_router)
 
 
 @app.get("/health")

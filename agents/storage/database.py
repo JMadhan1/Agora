@@ -33,7 +33,16 @@ DisputeAlertRecord = DisputeAlert
 # Engine & session factory
 # ---------------------------------------------------------------------------
 
-_DB_PATH = Path(__file__).parent.parent / "data" / "oracle_sentinel.db"
+import os as _os
+
+_DEFAULT_DB = Path(__file__).parent.parent / "data" / "oracle_sentinel.db"
+# On Vercel (read-only FS) use /tmp; locally use agents/data/
+_DB_PATH = Path(_os.getenv("DB_PATH", str(_DEFAULT_DB)))
+if not _DB_PATH.parent.exists():
+    try:
+        _DB_PATH = Path("/tmp/oracle_sentinel.db")
+    except Exception:
+        pass
 _DB_URL = f"sqlite:///{_DB_PATH}"
 
 engine = create_engine(_DB_URL, echo=False, connect_args={"check_same_thread": False})

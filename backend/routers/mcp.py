@@ -10,18 +10,14 @@ This is the B4 feature: monetized AI-to-AI commerce via Circle Gateway.
 from __future__ import annotations
 
 import os
-import sys
 import time
 import uuid
-from pathlib import Path
 from typing import Annotated
 
 import structlog
 from fastapi import APIRouter, Header, HTTPException, Request
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
-
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent / "agents"))
 
 log = structlog.get_logger()
 router = APIRouter()
@@ -138,28 +134,30 @@ async def mcp_get_attestation(
 
     # Try to read from DB
     try:
-        from storage.database import SessionLocal, get_latest_attestation
+        from storage.database import SessionLocal, AttestationRecord
+        from sqlalchemy import select
         session = SessionLocal()
         try:
-            attestation = get_latest_attestation(session, market_id)
-            if attestation:
-                estimate = getattr(attestation, "estimate", 0.5)
-                confidence = getattr(attestation, "confidence", 75)
-                verdict = (
-                    "YES" if estimate >= 0.65
-                    else "NO" if estimate <= 0.35
-                    else "UNCERTAIN"
-                )
+            row = session.scalars(
+                select(AttestationRecord)
+                .where(AttestationRecord.market_id == market_id)
+                .order_by(AttestationRecord.id.desc())
+                .limit(1)
+            ).first()
+            if row:
+                estimate = row.probability_estimate or 0.5
+                confidence = row.confidence or 75
+                verdict = "YES" if estimate >= 0.65 else "NO" if estimate <= 0.35 else "UNCERTAIN"
                 return AttestationMCPResponse(
                     market_id=market_id,
                     estimate=estimate,
                     confidence=confidence / 100 if confidence > 1 else confidence,
                     verdict=verdict,
-                    arc_tx_hash=getattr(attestation, "arc_tx_hash", None),
-                    ipfs_cid=getattr(attestation, "ipfs_cid", None),
-                    reasoning_summary=getattr(attestation, "narrative", "Bayesian inference on market signals."),
+                    arc_tx_hash=row.arc_tx_hash,
+                    ipfs_cid=row.ipfs_cid,
+                    reasoning_summary="Bayesian inference on market signals.",
                     brier_score=None,
-                    timestamp=str(getattr(attestation, "timestamp", "")),
+                    timestamp=str(row.timestamp),
                     payment_confirmed=True,
                     payment_amount_usdc=MCP_PRICE_USDC,
                     call_id=call_id,
@@ -219,22 +217,21 @@ async def mcp_get_dispute_alerts(
 
     alerts = []
     try:
-        from storage.database import SessionLocal
-        from storage.models import DisputeAlert
+        from storage.database import SessionLocal, DisputeAlertRecord
         from sqlalchemy import select
         session = SessionLocal()
         try:
             rows = session.scalars(
-                select(DisputeAlert)
-                .where(DisputeAlert.dispute_triggered == True)  # noqa: E712
-                .order_by(DisputeAlert.id.desc())
+                select(DisputeAlertRecord)
+                .where(DisputeAlertRecord.dispute_triggered == True)  # noqa: E712
+                .order_by(DisputeAlertRecord.id.desc())
                 .limit(limit)
             ).all()
             for row in rows:
                 alerts.append({
                     "market_id": row.market_id,
                     "deviation": row.deviation,
-                    "our_estimate": getattr(row, "our_estimate", None),
+                    "our_estimate": row.our_estimate,
                     "proposed_resolution": row.proposed_resolution,
                     "timestamp": str(row.timestamp),
                     "dispute_triggered": row.dispute_triggered,
@@ -270,20 +267,25 @@ async def mcp_get_markets(
     _revenue_tracker["total_calls"] += 1
 
     try:
-        from storage.database import SessionLocal, get_markets
+        from storage.database import SessionLocal, MarketRecord
+        from sqlalchemy import select
         session = SessionLocal()
         try:
-            markets = get_markets(session, resolved=False, limit=limit)
+            rows = session.scalars(
+                select(MarketRecord)
+                .where(MarketRecord.resolved == False)  # noqa: E712
+                .limit(limit)
+            ).all()
             return [
                 {
                     "id": m.id,
                     "question": m.question,
                     "current_yes_price": m.current_yes_price,
-                    "sentinel_estimate": getattr(m, "sentinel_estimate", m.current_yes_price),
-                    "end_date": str(m.end_date) if m.end_date else None,
+                    "sentinel_estimate": m.our_latest_estimate or m.current_yes_price,
+                    "end_date": m.resolution_date,
                     "resolved": m.resolved,
                 }
-                for m in markets
+                for m in rows
             ]
         finally:
             session.close()

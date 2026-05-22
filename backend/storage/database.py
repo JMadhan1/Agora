@@ -15,7 +15,8 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./oracle_sentinel.db")
+_default_db = "sqlite:////tmp/oracle_sentinel.db" if not os.path.exists("./data") else "sqlite:///./oracle_sentinel.db"
+DATABASE_URL = os.getenv("DATABASE_URL", _default_db)
 
 engine = create_engine(
     DATABASE_URL,
