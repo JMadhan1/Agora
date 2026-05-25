@@ -149,9 +149,9 @@ Built at the Agora Agents Hackathon, May 2026.
 
 <div align="center">
 
-| 🎬 Demo Video | 🔍 ArcScan Explorer | 📖 API Docs |
-|:---:|:---:|:---:|
-| [Watch on YouTube](https://youtu.be/RMRh5-pO8iA) | [testnet.arcscan.app](https://testnet.arcscan.app) | [Live API](https://oracle-sentinel.onrender.com/docs) |
+| � Live App | �🎬 Demo Video | 🔍 ArcScan Explorer | 📖 API Docs |
+|:---:|:---:|:---:|:---:|
+| [agora-frontend-kappa.vercel.app](https://agora-frontend-kappa.vercel.app) | [Watch on YouTube](https://youtu.be/RMRh5-pO8iA) | [testnet.arcscan.app](https://testnet.arcscan.app) | [Live API](https://oracle-sentinel.onrender.com/docs) |
 
 </div>
 
