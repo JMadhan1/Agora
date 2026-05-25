@@ -99,14 +99,28 @@ def get_db_fastapi() -> Generator[Session, None, None]:
 # ---------------------------------------------------------------------------
 
 
+def _coerce_datetime(value):
+    """Convert ISO string to datetime if needed."""
+    if isinstance(value, str):
+        try:
+            from datetime import datetime
+            return datetime.fromisoformat(value.replace("Z", "+00:00")).replace(tzinfo=None)
+        except (ValueError, AttributeError):
+            return None
+    return value
+
+
 def upsert_market(session: Session, data: dict) -> Market:
     """Insert or update a Market row by primary key (id)."""
+    _datetime_fields = {"resolution_date", "last_scouted", "created_at"}
     market = session.get(Market, data["id"])
     if market is None:
         market = Market(id=data["id"])
         session.add(market)
     for key, value in data.items():
         if key != "id" and hasattr(market, key):
+            if key in _datetime_fields and value is not None:
+                value = _coerce_datetime(value)
             setattr(market, key, value)
     session.flush()
     log.debug("upsert_market", market_id=data["id"])
