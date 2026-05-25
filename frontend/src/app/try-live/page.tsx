@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8001";
 
 const DEMO_MARKETS = [
   { id: "0xabc123", question: "Will Donald Trump win the 2026 midterms?" },
@@ -36,19 +36,21 @@ export default function TryLivePage() {
   async function connectWallet() {
     const w = (window as any).ethereum;
     if (!w) {
-      alert("MetaMask or compatible wallet required. Install MetaMask to continue.");
+      skipWallet();
       return;
     }
     try {
       const accounts: string[] = await w.request({ method: "eth_requestAccounts" });
-      if (accounts[0]) {
-        setWalletAddress(accounts[0]);
-        setStep("select");
-      }
-    } catch (e: any) {
-      setErrorMsg(e.message || "Wallet connection failed");
-      setStep("error");
+      setWalletAddress(accounts[0] ?? "");
+      setStep("select");
+    } catch {
+      skipWallet();
     }
+  }
+
+  function skipWallet() {
+    setWalletAddress("0xDemo...Observer");
+    setStep("select");
   }
 
   async function requestAttestation() {
@@ -168,7 +170,18 @@ export default function TryLivePage() {
               color: "#fff",
             }}
           >
-            Connect Wallet
+            🦊 Connect MetaMask
+          </button>
+          <button
+            onClick={skipWallet}
+            className="w-full py-2 rounded-xl font-medium text-sm transition-all hover:opacity-80"
+            style={{
+              background: "rgba(255,255,255,0.05)",
+              border: "1px solid rgba(255,255,255,0.1)",
+              color: "var(--text-muted)",
+            }}
+          >
+            Skip — Continue as Observer
           </button>
           <div className="flex items-center justify-center gap-6 text-xs" style={{ color: "var(--text-muted)" }}>
             <span>⚡ Arc Testnet</span>
