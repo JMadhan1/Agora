@@ -63,7 +63,7 @@ class Settings(BaseSettings):
     # Agent behavior
     scout_interval_seconds: int = 30
     dispute_deviation_threshold: float = 0.40
-    judge_confidence_threshold: float = 0.65
+    judge_confidence_threshold: float = 0.55
     max_markets_monitored: int = 200
     usyc_deploy_threshold_usdc: float = 50.0
     agent_bond_amount_usdc: float = 10.0
