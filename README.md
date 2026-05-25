@@ -1,8 +1,22 @@
-# ORACLE SENTINEL
+# ⚡ ORACLE SENTINEL
 
-> The autonomous AI truth verification network that prediction markets never knew they needed — and can no longer survive without.
+> **The autonomous AI truth verification network that prediction markets never knew they needed — and can no longer survive without.**
 
 **Agora Agents Hackathon | Canteen × Circle × Arc | May 2026**
+
+---
+
+## 🎬 See It Live — Watch the Demo First
+
+<div align="center">
+
+[![Oracle Sentinel Demo — Watch Now](https://img.youtube.com/vi/RMRh5-pO8iA/maxresdefault.jpg)](https://youtu.be/RMRh5-pO8iA)
+
+### 👆 Click to watch — AI agents detecting oracle manipulation in real-time, committing immutable attestations to Arc Testnet
+
+</div>
+
+> **In this demo:** A Scout Agent detects a suspicious Polymarket resolution → Judge Agent synthesizes multi-source evidence via Bayesian inference → Attestation committed on-chain in under 10 seconds → Watchdog triggers an automated dispute before manipulation finalizes.
 
 ---
 
@@ -128,3 +142,25 @@ From day 1, ORACLE SENTINEL monitors **200 live Polymarket markets** — zero us
 ## Team
 
 Built at the Agora Agents Hackathon, May 2026.
+
+---
+
+## 🚀 Links
+
+<div align="center">
+
+| 🎬 Demo Video | 🔍 ArcScan Explorer | 📖 API Docs |
+|:---:|:---:|:---:|
+| [Watch on YouTube](https://youtu.be/RMRh5-pO8iA) | [testnet.arcscan.app](https://testnet.arcscan.app) | [Live API](https://oracle-sentinel.onrender.com/docs) |
+
+</div>
+
+---
+
+<div align="center">
+
+**⚡ Built with Arc Testnet · Circle USDC · Polymarket · LangGraph · Groq**
+
+*Every oracle lie leaves a trace. Oracle Sentinel finds it.*
+
+</div>
