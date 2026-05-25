@@ -139,13 +139,13 @@ class MarketFetcher:
 
     _cache_markets: list[dict] = []
     _cache_ts: float = 0
-    CACHE_TTL = 60  # seconds
+    CACHE_TTL = 600  # seconds — 10 min to avoid hammering unreachable API
 
     def __init__(self, gamma_api: str = GAMMA_BASE, clob_api: str = "https://clob.polymarket.com"):
         self.gamma_api = gamma_api.rstrip("/")
         self.clob_api = clob_api.rstrip("/")
         self._client = httpx.AsyncClient(
-            timeout=30.0,
+            timeout=5.0,
             headers={"User-Agent": "OracleSentinel/1.0"},
         )
 

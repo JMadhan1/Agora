@@ -7,10 +7,18 @@ log = structlog.get_logger()
 
 GAMMA_API = "https://gamma-api.polymarket.com"
 
+_SEED_MARKETS = [
+    {"id": "seed-btc-100k", "question": "Will Bitcoin reach $100,000 before end of 2025?", "category": "Crypto", "volume": 5000000.0, "current_yes_price": 0.62, "resolution_date": "2025-12-31T00:00:00Z", "our_latest_estimate": 0.5, "our_confidence": 0.0, "last_scouted": None, "resolved": False, "actual_resolution": None, "created_at": "2025-01-01T00:00:00Z"},
+    {"id": "seed-eth-flip-btc", "question": "Will Ethereum flip Bitcoin in market cap in 2025?", "category": "Crypto", "volume": 2000000.0, "current_yes_price": 0.12, "resolution_date": "2025-12-31T00:00:00Z", "our_latest_estimate": 0.5, "our_confidence": 0.0, "last_scouted": None, "resolved": False, "actual_resolution": None, "created_at": "2025-01-01T00:00:00Z"},
+    {"id": "seed-fed-rate-cut", "question": "Will the Fed cut interest rates by July 2025?", "category": "Economics", "volume": 3000000.0, "current_yes_price": 0.45, "resolution_date": "2025-07-31T00:00:00Z", "our_latest_estimate": 0.5, "our_confidence": 0.0, "last_scouted": None, "resolved": False, "actual_resolution": None, "created_at": "2025-01-01T00:00:00Z"},
+    {"id": "seed-trump-approval", "question": "Will Trump's approval rating exceed 50% in 2025?", "category": "Politics", "volume": 1500000.0, "current_yes_price": 0.35, "resolution_date": "2025-12-31T00:00:00Z", "our_latest_estimate": 0.5, "our_confidence": 0.0, "last_scouted": None, "resolved": False, "actual_resolution": None, "created_at": "2025-01-01T00:00:00Z"},
+    {"id": "seed-arc-mainnet", "question": "Will Arc Mainnet launch before end of 2025?", "category": "Crypto", "volume": 500000.0, "current_yes_price": 0.78, "resolution_date": "2025-12-31T00:00:00Z", "our_latest_estimate": 0.5, "our_confidence": 0.0, "last_scouted": None, "resolved": False, "actual_resolution": None, "created_at": "2025-01-01T00:00:00Z"},
+]
+
 
 class MarketService:
     def __init__(self):
-        self._client = httpx.AsyncClient(timeout=20.0, headers={"User-Agent": "OracleSentinel/1.0"})
+        self._client = httpx.AsyncClient(timeout=4.0, headers={"User-Agent": "OracleSentinel/1.0"})
 
     async def get_live_polymarket_markets(self, limit: int = 50) -> list[dict]:
         """Fetches top active markets from Polymarket Gamma API."""
@@ -34,8 +42,8 @@ class MarketService:
                 for m in markets if m.get("question")
             ]
         except Exception as e:
-            log.error("live_markets_fetch_failed", error=str(e))
-            return []
+            log.warning("live_markets_fetch_failed_using_seeds", error=str(e))
+            return _SEED_MARKETS[:limit]
 
     async def close(self):
         await self._client.aclose()
